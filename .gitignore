@@ -1,0 +1,9 @@
+# ignore .pyc, anywhere in the tree
+*.pyc
+
+# Ignoring directories
+bin/
+
+# Spyder project settings
+.spyderproject
+.spyproject
