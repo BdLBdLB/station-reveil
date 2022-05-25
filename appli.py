@@ -8,16 +8,15 @@ from PyQt5.QtCore import QTimer, QTime, Qt
 # from pyqtgraph import PlotWidget, plot # pip install pyqtgraph==0.11.1
 # import pyqtgraph as pg
 
-import pandas as pd
-import numpy as np
-from datetime import datetime
+# import pandas as pd
+# import numpy as np
+# from datetime import datetime
 
 import matplotlib
 matplotlib.use("Qt5Agg")
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt5agg import (
-    FigureCanvasQTAgg as FigureCanvas,
-    NavigationToolbar2QT as NavigationToolbar)
+from matplotlib import pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 
 import getWeather
@@ -77,7 +76,15 @@ class Window(QWidget):
         self.labelIconWeather2.setAlignment(Qt.AlignCenter) 
          
                 
-        # --- plot        
+        # --- plot 
+        plt.style.use("seaborn-dark")
+        # for param in ['figure.facecolor', 'axes.facecolor', 'savefig.facecolor']:
+        #     plt.rcParams[param] = '#212946'  # bluish dark grey
+
+        # for param in ['text.color', 'axes.labelcolor', 'xtick.color', 'ytick.color']:
+        #     plt.rcParams[param] = '0.9'  # very light grey
+            
+            
         self.figure = Figure()
         #♥self.figure.patch.set_facecolor('#E0E0E0')
         self.figure.patch.set_alpha(0)
@@ -125,13 +132,39 @@ class Window(QWidget):
         
         self.axisTemperature.clear()
         self.axisTemperature.set_ylabel('Temperature (°C)')
-        self.axisTemperature.plot(weather.previsions["heureDePrediction"], weather.previsions["temperaturePrevue"], 'k')
-        self.axisTemperature.patch.set_alpha(0)
         
         self.axisRain.clear()
         self.axisRain.set_ylabel('Précipitations (mm)')
-        self.axisRain.plot(weather.previsions["heureDePrediction"], weather.previsions["precipitations"], 'k')
+        
+        n_lines = 10
+        diff_linewidth = 1.05
+        alpha_value = 0.03
+        self.axisRain.plot(weather.previsions["heureDePrediction"], weather.previsions["precipitations"], marker = "o", color = '#08F7FE')
+        self.axisTemperature.plot(weather.previsions["heureDePrediction"], weather.previsions["temperaturePrevue"], marker = "o", color = '#FE53BB')
+        for n in range(1, n_lines+1):
+            self.axisRain.plot(weather.previsions["heureDePrediction"], weather.previsions["precipitations"], 
+                               marker = "o", 
+                               linewidth=2+(diff_linewidth*n), 
+                               alpha=alpha_value,
+                               color = '#08F7FE')
+            self.axisTemperature.plot(weather.previsions["heureDePrediction"], weather.previsions["temperaturePrevue"], 
+                               marker = "o", 
+                               linewidth=2+(diff_linewidth*n), 
+                               alpha=alpha_value,                                      
+                               color = '#FE53BB')
+                    
+        self.axisTemperature.grid(color='#2A3459')
+        self.axisRain.grid(color='#2A3459')
+
+        
         self.axisRain.patch.set_alpha(0)
+        self.axisTemperature.patch.set_alpha(0)
+        
+        
+        # --
+        self.axisTemperature.grid(color='#2A3459')
+        self.axisRain.grid(color='#2A3459')
+        #--
         
         self.figure.tight_layout() 
         self.axisTemperature.figure.canvas.draw()
