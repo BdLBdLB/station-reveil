@@ -4,14 +4,23 @@ from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel
 from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtCore import QTimer, QTime, Qt
-from pyqtgraph import PlotWidget, plot # pip install pyqtgraph==0.11.1
-import pyqtgraph as pg
+
+# from pyqtgraph import PlotWidget, plot # pip install pyqtgraph==0.11.1
+# import pyqtgraph as pg
+
 import pandas as pd
 import numpy as np
 from datetime import datetime
 
+import matplotlib
+matplotlib.use("Qt5Agg")
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_qt5agg import (
+    FigureCanvasQTAgg as FigureCanvas,
+    NavigationToolbar2QT as NavigationToolbar)
+
+
 import getWeather
-# import loadWeatherIcon
 import Weather
 import date
 
@@ -40,8 +49,9 @@ class Window(QWidget):
         self.labelDay = QLabel()
         self.labelDay.setAlignment(Qt.AlignCenter)
         self.labelDay.setFont(QFont('Arial', 20))
-        self.labelDay.setText(date.todayAsAString())
+        # self.labelDay.setText(date.todayAsAString())
         layout.addWidget(self.labelDay) 
+
 
         layoutWeather = QHBoxLayout()
         layout.addLayout(layoutWeather)
@@ -53,39 +63,34 @@ class Window(QWidget):
         self.labelWeather = QLabel()
         self.labelWeather.setAlignment(Qt.AlignCenter)  
         self.labelWeather.setFont(QFont('Arial', 10)) 
-        self.labelWeather.setText(getWeather.getWeather())
+        #self.labelWeather.setText(getWeather.getWeather())
         layoutInfoWeather.addWidget(self.labelWeather)
         timerWeather = QTimer(self)  
         timerWeather.timeout.connect(self.showWeather) 
-        timerWeather.start(1000*60*5) # actualisation de la meteo toutes les 5 minutes       
+        timerWeather.start(1000*60*5) # actualisation de la meteo toutes les 5 minutes     
+        
+        # creating a label for the weather icon
+        self.labelIconWeather = QLabel(self)
+        # pixmap = QPixmap(weather.loadWeatherIcon(0))
+        # self.labelIconWeather.setPixmap(pixmap)
+        layoutInfoWeather.addWidget(self.labelIconWeather)
+        self.labelIconWeather.setAlignment(Qt.AlignCenter)  
                 
         # --- plot
         layoutPlot = QVBoxLayout()
         layoutWeather.addLayout(layoutPlot)
         
-        pen = pg.mkPen(color=(255, 0, 0))
-        styles = {'color':'r', 'font-size':'20px'}
-        
-        self.graphTemperature = pg.PlotWidget()
-        self.graphTemperature.setBackground('g')
-        self.graphTemperature.setLabel('left', 'Temperature (°C)', **styles)
-        # self.graphTemperature.plot(str(weather.previsions["heureDePrediction"]), weather.previsions["temperaturePrevue"])
-        self.graphTemperature.plot(weather.previsions["temperaturePrevue"], pen = pen)
-        layoutPlot.addWidget(self.graphTemperature)
-        
-        self.graphRain = pg.PlotWidget()
-        self.graphRain.setBackground('g')
-        self.graphRain.setLabel('left', 'Précipitation (mm)', **styles)
-        # self.graphTemperature.plot(str(weather.previsions["precipitations"]), weather.previsions["temperaturePrevue"])
-        self.graphRain.plot(weather.previsions["precipitations"], pen = pen)
-        layoutPlot.addWidget(self.graphRain)
+        self.figure = Figure()
+        self.axisTemperature = self.figure.add_subplot(211)  
+        self.axisRain = self.figure.add_subplot(212, sharex = self.axisTemperature)
+
+        self.canvas = FigureCanvas(self.figure)
+        layoutPlot.addWidget(self.canvas)
         # ---
         
-        self.labelIconWeather = QLabel(self)
-        pixmap = QPixmap(weather.loadWeatherIcon(0))
-        self.labelIconWeather.setPixmap(pixmap)
-        layoutInfoWeather.addWidget(self.labelIconWeather)
-        self.labelIconWeather.setAlignment(Qt.AlignCenter)  
+        self.showWeather()
+        
+        
 
 
 
@@ -99,9 +104,26 @@ class Window(QWidget):
     
     def showWeather(self):
         self.labelWeather.setText(getWeather.getWeather())
+        
         weather.updatePrevisions()
+        
         pixmap = QPixmap(weather.loadWeatherIcon(0))
         self.labelIconWeather.setPixmap(pixmap)
+        
+        
+        self.axisTemperature.clear()
+        self.axisTemperature.set_ylabel('Temperature (°C)')
+        self.axisTemperature.plot(weather.previsions["heureDePrediction"], weather.previsions["temperaturePrevue"])
+        
+        self.axisRain.clear()
+        self.axisRain.set_ylabel('Précipitations (mm)')
+        self.axisRain.plot(weather.previsions["heureDePrediction"], weather.previsions["precipitations"])
+        
+        self.figure.tight_layout() 
+        self.axisTemperature.figure.canvas.draw()
+        self.axisRain.figure.canvas.draw()
+        
+
 
   
 # create pyqt5 app

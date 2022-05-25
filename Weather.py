@@ -10,9 +10,6 @@ from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
 from PIL import Image
-from matplotlib import pyplot as plt
-import matplotlib
-matplotlib.use('TKAgg')
 
 
 
@@ -259,7 +256,11 @@ class Weather():
         return "icon/" + iconID + ".png"   
     
     
-if __name__ == '__main__':   
+if __name__ == '__main__':  
+    from matplotlib import pyplot as plt
+    import matplotlib
+    matplotlib.use('TKAgg')
+    
     we = Weather()
     
     plt.figure()
