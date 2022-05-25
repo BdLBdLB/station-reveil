@@ -79,6 +79,8 @@ class Window(QWidget):
                 
         # --- plot        
         self.figure = Figure()
+        #♥self.figure.patch.set_facecolor('#E0E0E0')
+        self.figure.patch.set_alpha(0)
         self.axisTemperature = self.figure.add_subplot(211)  
         self.axisRain = self.figure.add_subplot(212, sharex = self.axisTemperature)
         self.canvas = FigureCanvas(self.figure)
@@ -123,11 +125,13 @@ class Window(QWidget):
         
         self.axisTemperature.clear()
         self.axisTemperature.set_ylabel('Temperature (°C)')
-        self.axisTemperature.plot(weather.previsions["heureDePrediction"], weather.previsions["temperaturePrevue"])
+        self.axisTemperature.plot(weather.previsions["heureDePrediction"], weather.previsions["temperaturePrevue"], 'k')
+        self.axisTemperature.patch.set_alpha(0)
         
         self.axisRain.clear()
         self.axisRain.set_ylabel('Précipitations (mm)')
-        self.axisRain.plot(weather.previsions["heureDePrediction"], weather.previsions["precipitations"])
+        self.axisRain.plot(weather.previsions["heureDePrediction"], weather.previsions["precipitations"], 'k')
+        self.axisRain.patch.set_alpha(0)
         
         self.figure.tight_layout() 
         self.axisTemperature.figure.canvas.draw()

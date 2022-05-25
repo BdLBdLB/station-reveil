@@ -38,8 +38,8 @@ def getWeather():
             content += "Le temps est "+weather_desc+"."
             content += "\n"
             content += "La maximale sera de "+day_max_temp+"°C."
-            content += "\n"
-            content += str(datetime.datetime.now())
+            # content += "\n"
+            # content += str(datetime.datetime.now())
     
     return content;
 
