@@ -14,12 +14,12 @@ from PIL import Image
 
 
 class Weather():
+    """
+    """
+    openWeatherMapExpirationDuration = 60 * 15 # \todo parametre global
+    format = "%Y-%m-%d %H:%M:%S.%f"  
     
-    
-    def __init__(self):
-        
-        self.openWeatherMapExpirationDuration = 60 * 15 # \todo parametre global
-        self.format = "%Y-%m-%d %H:%M:%S.%f"        
+    def __init__(self):              
         self.timestamp = self.initializeTimeStamp()
         
         weather_data, forecast_data = self.getWeather(self.isWeatherOld())
@@ -39,8 +39,9 @@ class Weather():
     def getWeather(self, mode):
         """
         Executes two requests to get the current weather and the 4 days forecast in Paris
-        mode: 0 uses already saved forecast (no actual request)
-              1 requests 2 json from openweathermap.org
+        mode: 
+            0 uses already saved forecast (no actual request)
+            1 requests 2 json from openweathermap.org
     
         return 2 json (weather and forecast)
         """
@@ -49,7 +50,6 @@ class Weather():
             weather_data = json.load(open("weather.json", "r"))
     
         else: # call API weatherforecastmap
-            #todo Interroger l'API uniquement si la dernière requête est plus vieille que 10 minutes
             API_key = "ce386df03805fde750160dc2037f729c" # \todo Cacher cette clé     
             city_id = "2968815" # Paris : 2968815
             
@@ -89,10 +89,10 @@ class Weather():
         reads 2 json to create 1 pandas dataframe with relevent information
         return 1 dataframe
         """
-        # init du dataframe contenant toutes les prévisions
+        # initialisation
         previsions = pd.DataFrame(columns=['heureDePrediction','temperaturePrevue','temperatureRessentie','temperatureMinmale', 'temperatureMaximale', 'precipitations', 'icon'])
     
-        # Lecture des donnees de la meteo actuelle
+        # Read data of current weather
         try:
             heureDePrediction = datetime.fromtimestamp(weather_data["dt"])
         except:
@@ -128,7 +128,7 @@ class Weather():
         except:
             icon = ""
             
-        # mise a jour du dataframe previsions  
+        # update dateframe with current weather  
         try:
             prevision = pd.DataFrame([[heureDePrediction, temperaturePrevue, temperatureRessentie, temperatureMinmale, temperatureMaximale, precipitations, icon]], columns=['heureDePrediction','temperaturePrevue','temperatureRessentie','temperatureMinmale', 'temperatureMaximale', 'precipitations', 'icon'])
             previsions = pd.concat([previsions, prevision], ignore_index = True)
@@ -136,7 +136,7 @@ class Weather():
             pass
     
     
-        # lecture de la meteo des prochaines heures
+        # Read data of forecasts
         try:
             for forecast in forecast_data["list"]:
                 try:
@@ -175,7 +175,7 @@ class Weather():
                 except:
                     icon = ""
                 
-                # mise a jour du dataframe previsions   
+                # update previsions with forecast   
                 try:
                     prevision = pd.DataFrame([[heureDePrediction, temperaturePrevue, temperatureRessentie, temperatureMinmale, temperatureMaximale, precipitations, icon]], columns=['heureDePrediction','temperaturePrevue','temperatureRessentie','temperatureMinmale', 'temperatureMaximale', 'precipitations', 'icon'])
                     previsions = pd.concat([previsions, prevision], ignore_index = True)

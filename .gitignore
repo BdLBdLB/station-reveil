@@ -9,8 +9,8 @@ __pycache__
 .spyderproject
 .spyproject
 
-# Ignoring directoy with icons
-icon/
+# Ignoring directory with icons
+# icon
 
 *.json
 .json
