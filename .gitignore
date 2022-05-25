@@ -3,7 +3,13 @@
 
 # Ignoring directories
 bin/
+__pycache__
 
 # Spyder project settings
 .spyderproject
 .spyproject
+
+# Ignoring directoy with icons
+icon/
+
+*.json
