@@ -31,25 +31,22 @@ class Window(QWidget):
     def __init__(self):
         super().__init__()
         self.setGeometry(100, 100, 800, 800)
+        font = "Arial"
+        self.setStyleSheet("background-color: green;") 
+        
         layout = QVBoxLayout()
         self.setLayout(layout)
-        font = QFont('Arial', 120, QFont.Bold)
-        self.setStyleSheet("background-color: green;") 
 
         # creating a label object for the clock
         self.labelClock = QLabel() 
         self.labelClock.setAlignment(Qt.AlignCenter)  
-        self.labelClock.setFont(font) 
-        layout.addWidget(self.labelClock) 
-        timerClock = QTimer(self)  
-        timerClock.timeout.connect(self.showTime) 
-        timerClock.start(1000)     
+        self.labelClock.setFont(QFont(font, 120, QFont.Bold))
+        layout.addWidget(self.labelClock)     
         
         # creating a label for the day
         self.labelDay = QLabel()
         self.labelDay.setAlignment(Qt.AlignCenter)
-        self.labelDay.setFont(QFont('Arial', 20))
-        # self.labelDay.setText(date.todayAsAString())
+        self.labelDay.setFont(QFont(font, 20))
         layout.addWidget(self.labelDay) 
 
 
@@ -62,31 +59,40 @@ class Window(QWidget):
         # creating a label for the weather
         self.labelWeather = QLabel()
         self.labelWeather.setAlignment(Qt.AlignCenter)  
-        self.labelWeather.setFont(QFont('Arial', 10)) 
-        #self.labelWeather.setText(getWeather.getWeather())
+        self.labelWeather.setFont(QFont(font, 10)) 
         layoutInfoWeather.addWidget(self.labelWeather)
-        timerWeather = QTimer(self)  
-        timerWeather.timeout.connect(self.showWeather) 
-        timerWeather.start(1000*60*5) # actualisation de la meteo toutes les 5 minutes     
         
         # creating a label for the weather icon
-        self.labelIconWeather = QLabel(self)
-        # pixmap = QPixmap(weather.loadWeatherIcon(0))
-        # self.labelIconWeather.setPixmap(pixmap)
-        layoutInfoWeather.addWidget(self.labelIconWeather)
-        self.labelIconWeather.setAlignment(Qt.AlignCenter)  
-                
-        # --- plot
-        layoutPlot = QVBoxLayout()
-        layoutWeather.addLayout(layoutPlot)
+        layoutIcon = QHBoxLayout()
+        layoutInfoWeather.addLayout(layoutIcon)
         
+        self.labelIconWeather0 = QLabel(self)
+        layoutIcon.addWidget(self.labelIconWeather0)
+        self.labelIconWeather0.setAlignment(Qt.AlignCenter) 
+        self.labelIconWeather1 = QLabel(self)
+        layoutIcon.addWidget(self.labelIconWeather1)
+        self.labelIconWeather1.setAlignment(Qt.AlignCenter) 
+        self.labelIconWeather2 = QLabel(self)
+        layoutIcon.addWidget(self.labelIconWeather2)
+        self.labelIconWeather2.setAlignment(Qt.AlignCenter) 
+         
+                
+        # --- plot        
         self.figure = Figure()
         self.axisTemperature = self.figure.add_subplot(211)  
         self.axisRain = self.figure.add_subplot(212, sharex = self.axisTemperature)
-
         self.canvas = FigureCanvas(self.figure)
-        layoutPlot.addWidget(self.canvas)
+        layoutWeather.addWidget(self.canvas)
         # ---
+        
+        
+        timerClock = QTimer(self)  
+        timerClock.timeout.connect(self.showTime) # actualisation de la date/heure toutes les secondes
+        timerClock.start(1000) 
+        
+        timerWeather = QTimer(self)  
+        timerWeather.timeout.connect(self.showWeather) 
+        timerWeather.start(1000*60*5) # actualisation de la meteo toutes les 5 minutes     
         
         self.showWeather()
         
@@ -108,7 +114,11 @@ class Window(QWidget):
         weather.updatePrevisions()
         
         pixmap = QPixmap(weather.loadWeatherIcon(0))
-        self.labelIconWeather.setPixmap(pixmap)
+        self.labelIconWeather0.setPixmap(pixmap)
+        pixmap = QPixmap(weather.loadWeatherIcon(1))
+        self.labelIconWeather1.setPixmap(pixmap)
+        pixmap = QPixmap(weather.loadWeatherIcon(2))
+        self.labelIconWeather2.setPixmap(pixmap)
         
         
         self.axisTemperature.clear()
