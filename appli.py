@@ -11,8 +11,10 @@ import numpy as np
 from datetime import datetime
 
 import getWeather
+# import loadWeatherIcon
+import Weather
 import date
-import loadWeatherIcon
+
   
   
 class Window(QWidget):
@@ -41,7 +43,6 @@ class Window(QWidget):
         self.labelDay.setText(date.todayAsAString())
         layout.addWidget(self.labelDay) 
 
-        previsions, iconURL = loadWeatherIcon.loadWeatherIcon()
         layoutWeather = QHBoxLayout()
         layout.addLayout(layoutWeather)
         
@@ -68,20 +69,20 @@ class Window(QWidget):
         self.graphTemperature = pg.PlotWidget()
         self.graphTemperature.setBackground('g')
         self.graphTemperature.setLabel('left', 'Temperature (°C)', **styles)
-        # self.graphTemperature.plot(str(previsions["heureDePrediction"]), previsions["temperaturePrevue"])
-        self.graphTemperature.plot(previsions["temperaturePrevue"], pen = pen)
+        # self.graphTemperature.plot(str(weather.previsions["heureDePrediction"]), weather.previsions["temperaturePrevue"])
+        self.graphTemperature.plot(weather.previsions["temperaturePrevue"], pen = pen)
         layoutPlot.addWidget(self.graphTemperature)
         
         self.graphRain = pg.PlotWidget()
         self.graphRain.setBackground('g')
         self.graphRain.setLabel('left', 'Précipitation (mm)', **styles)
-        # self.graphTemperature.plot(str(previsions["precipitations"]), previsions["temperaturePrevue"])
-        self.graphRain.plot(previsions["precipitations"], pen = pen)
+        # self.graphTemperature.plot(str(weather.previsions["precipitations"]), weather.previsions["temperaturePrevue"])
+        self.graphRain.plot(weather.previsions["precipitations"], pen = pen)
         layoutPlot.addWidget(self.graphRain)
         # ---
         
         self.labelIconWeather = QLabel(self)
-        pixmap = QPixmap(iconURL)
+        pixmap = QPixmap(weather.loadWeatherIcon(0))
         self.labelIconWeather.setPixmap(pixmap)
         layoutInfoWeather.addWidget(self.labelIconWeather)
         self.labelIconWeather.setAlignment(Qt.AlignCenter)  
@@ -98,12 +99,13 @@ class Window(QWidget):
     
     def showWeather(self):
         self.labelWeather.setText(getWeather.getWeather())
-        iconURL = loadWeatherIcon.loadWeatherIcon()
-        pixmap = QPixmap(iconURL)
+        weather.updatePrevisions()
+        pixmap = QPixmap(weather.loadWeatherIcon(0))
         self.labelIconWeather.setPixmap(pixmap)
 
   
 # create pyqt5 app
+weather = Weather.Weather()
 App = QApplication(sys.argv)  
 # create the instance of our Window
 window = Window()  

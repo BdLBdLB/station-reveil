@@ -10,6 +10,9 @@ from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
 from PIL import Image
+from matplotlib import pyplot as plt
+import matplotlib
+matplotlib.use('TKAgg')
 
 
 
@@ -258,3 +261,30 @@ class Weather():
     
 if __name__ == '__main__':   
     we = Weather()
+    
+    plt.figure()
+    ax1 = plt.subplot(211)
+    plt.plot(we.previsions["heureDePrediction"], we.previsions["temperaturePrevue"], label = "temperature prevue")
+    plt.plot(we.previsions["heureDePrediction"], we.previsions["temperatureRessentie"], label = "temperature ressentie")
+    # plt.plot(we.previsions["heureDePrediction"], we.previsions["temperatureMinmale"], label = "temperature minimale")
+    # plt.plot(we.previsions["heureDePrediction"], we.previsions["temperatureMaximale"], label = "temperature maximale")
+    plt.ylabel("°C")
+    plt.grid(True)
+    plt.box(True)
+    plt.legend()
+    
+    plt.subplot(212, sharex = ax1)
+    plt.plot(we.previsions["heureDePrediction"], we.previsions["precipitations"])
+    plt.ylabel('Précipitations [mm]')
+    plt.box(True)
+    plt.grid(True)
+    plt.show()
+    
+    # # %%
+    # icon = weather_data["weather"][0]["icon"]
+    # url = "http://openweathermap.org/img/wn/" + icon + "@2x.png"
+    # #img = plt.imread("http://openweathermap.org/img/wn/10d@2x.png")
+    # img = plt.imread(url)
+    # plt.figure()
+    # plt.imshow(img)
+    # plt.box(False)
