@@ -17,4 +17,13 @@ def todayAsAString():
 
     return date
 
+def dayOfTheWeek(date):
+    joursDeLaSemaine = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"] # \todo param global
+    
+    day = [] 
+    for d in range(0, len(date)):
+        day.append(joursDeLaSemaine[date[d].weekday()])
+
+    return day
+
 

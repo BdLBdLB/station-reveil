@@ -94,7 +94,8 @@ class Weather():
     
         # Read data of current weather
         try:
-            heureDePrediction = datetime.fromtimestamp(weather_data["dt"])
+            heureDePrediction = datetime.fromtimestamp(weather_data["dt"]) # https://www.epochconverter.com/
+            #print(heureDePrediction)
         except:
             print("no timestamp !")
             heureDePrediction = np.nan
@@ -196,13 +197,14 @@ class Weather():
         """
                
         lastOpenWeatherMapRequests_dateExpiration = self.timestamp + timedelta(seconds = self.openWeatherMapExpirationDuration)
-             
+        
+        
         if datetime.now() < lastOpenWeatherMapRequests_dateExpiration: # to early to call API
-            #print("to early to call API")
+            # print("to early to call API")
             isWeatherOld = 0
         
         else: # API can be called
-            #print("API can be called") # fonction d'appel de l'API + creation des json
+            # print("API can be called") # fonction d'appel de l'API + creation des json
             isWeatherOld = 1
             
         return isWeatherOld
@@ -216,6 +218,7 @@ class Weather():
         try : # read the time stamp of the last succesful API request
             with open("lastOpenWeatherMapRequests.json", "r") as read_file:
                 lastOpenWeatherMapRequests = json.load(read_file)
+
             
         except: # initialize time stamp if API never responded
             lastOpenWeatherMapRequests = {"date" : str(datetime.now() - timedelta(seconds = self.openWeatherMapExpirationDuration + 1))}
@@ -260,10 +263,14 @@ if __name__ == '__main__':
     from matplotlib import pyplot as plt
     import matplotlib
     matplotlib.use('TKAgg')
+    import matplotlib.dates as mdates
+    
+    import date
     
     we = Weather()
     
-    plt.figure()
+    figure = plt.figure()
+    figure.clear()
     ax1 = plt.subplot(211)
     plt.plot(we.previsions["heureDePrediction"], we.previsions["temperaturePrevue"], label = "temperature prevue")
     plt.plot(we.previsions["heureDePrediction"], we.previsions["temperatureRessentie"], label = "temperature ressentie")
@@ -274,12 +281,24 @@ if __name__ == '__main__':
     plt.box(True)
     plt.legend()
     
-    plt.subplot(212, sharex = ax1)
-    plt.plot(we.previsions["heureDePrediction"], we.previsions["precipitations"])
+    ax2 = plt.subplot(212, sharex = ax1)
+    plt.bar(we.previsions["heureDePrediction"], we.previsions["precipitations"], width = 0.12)
     plt.ylabel('Précipitations [mm]')
     plt.box(True)
     plt.grid(True)
     plt.show()
+    
+    ax2.set_xlim(np.min(we.previsions["heureDePrediction"].apply(lambda x : x)), np.max(we.previsions["heureDePrediction"].apply(lambda x : x)))
+    xticks = list(set(we.previsions["heureDePrediction"].apply(lambda x : x.replace(hour = 0))))
+    xtickslabel = date.dayOfTheWeek(xticks)
+    ax2.set(xticks = xticks)
+    ax2.set(xticklabels = xtickslabel)
+    
+    ax1.set_xlim(np.min(we.previsions["heureDePrediction"].apply(lambda x : x)), np.max(we.previsions["heureDePrediction"].apply(lambda x : x)))
+    # ax1.set(xticks = xticks)
+    # ax1.set(xticklabels = date.dayOfTheWeek(xticks))
+    
+# %% 
     
     # # %%
     # icon = weather_data["weather"][0]["icon"]

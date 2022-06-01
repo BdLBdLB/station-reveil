@@ -9,7 +9,7 @@ from PyQt5.QtCore import QTimer, QTime, Qt
 # import pyqtgraph as pg
 
 # import pandas as pd
-# import numpy as np
+import numpy as np
 # from datetime import datetime
 
 import matplotlib
@@ -17,9 +17,10 @@ matplotlib.use("Qt5Agg")
 from matplotlib.figure import Figure
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+import matplotlib.dates as mdates
 
 
-import getWeather
+# import getWeather
 import Weather
 import date
 
@@ -31,19 +32,22 @@ class Window(QWidget):
         super().__init__()
         self.setGeometry(100, 100, 800, 800)
         font = "Arial"
-        self.setStyleSheet("background-color: green;") 
+        fontColor = "white"
+        self.setStyleSheet("background-color: black")
         
         layout = QVBoxLayout()
         self.setLayout(layout)
 
         # creating a label object for the clock
         self.labelClock = QLabel() 
+        self.labelClock.setStyleSheet("color : " + fontColor)
         self.labelClock.setAlignment(Qt.AlignCenter)  
         self.labelClock.setFont(QFont(font, 120, QFont.Bold))
         layout.addWidget(self.labelClock)     
         
         # creating a label for the day
         self.labelDay = QLabel()
+        self.labelDay.setStyleSheet("color : " + fontColor)
         self.labelDay.setAlignment(Qt.AlignCenter)
         self.labelDay.setFont(QFont(font, 20))
         layout.addWidget(self.labelDay) 
@@ -56,10 +60,11 @@ class Window(QWidget):
         layoutWeather.addLayout(layoutInfoWeather)
         
         # creating a label for the weather
-        self.labelWeather = QLabel()
-        self.labelWeather.setAlignment(Qt.AlignCenter)  
-        self.labelWeather.setFont(QFont(font, 10)) 
-        layoutInfoWeather.addWidget(self.labelWeather)
+        # self.labelWeather = QLabel()
+        # self.labelWeather.setStyleSheet("color : " + fontColor)
+        # self.labelWeather.setAlignment(Qt.AlignCenter)  
+        # self.labelWeather.setFont(QFont(font, 15)) 
+        # layoutInfoWeather.addWidget(self.labelWeather)
         
         # creating a label for the weather icon
         layoutIcon = QHBoxLayout()
@@ -77,17 +82,17 @@ class Window(QWidget):
          
                 
         # --- plot 
-        plt.style.use("seaborn-dark")
-        # for param in ['figure.facecolor', 'axes.facecolor', 'savefig.facecolor']:
-        #     plt.rcParams[param] = '#212946'  # bluish dark grey
-
-        # for param in ['text.color', 'axes.labelcolor', 'xtick.color', 'ytick.color']:
-        #     plt.rcParams[param] = '0.9'  # very light grey
-            
+        plt.style.use("seaborn-dark")            
             
         self.figure = Figure()
-        #♥self.figure.patch.set_facecolor('#E0E0E0')
+        matplotlib.rcParams['font.family'] = font
+        matplotlib.rcParams['text.color'] = fontColor
+        matplotlib.rcParams['axes.labelcolor'] = fontColor
+        matplotlib.rcParams['xtick.color'] = fontColor
+        matplotlib.rcParams['ytick.color'] = fontColor
+        plt.rc('font', size=15)
         self.figure.patch.set_alpha(0)
+        
         self.axisTemperature = self.figure.add_subplot(211)  
         self.axisRain = self.figure.add_subplot(212, sharex = self.axisTemperature)
         self.canvas = FigureCanvas(self.figure)
@@ -118,7 +123,7 @@ class Window(QWidget):
         self.labelDay.setText(date.todayAsAString()) # \todo effectuer cette action uniquement si changement de jour
     
     def showWeather(self):
-        self.labelWeather.setText(getWeather.getWeather())
+        # self.labelWeather.setText(getWeather.getWeather())
         
         weather.updatePrevisions()
         
@@ -139,26 +144,32 @@ class Window(QWidget):
         n_lines = 10
         diff_linewidth = 1.05
         alpha_value = 0.03
-        self.axisRain.plot(weather.previsions["heureDePrediction"], weather.previsions["precipitations"], marker = "o", color = '#08F7FE')
+        self.axisRain.bar(weather.previsions["heureDePrediction"], weather.previsions["precipitations"], width = 0.12, color = 'b')
         self.axisTemperature.plot(weather.previsions["heureDePrediction"], weather.previsions["temperaturePrevue"], marker = "o", color = '#FE53BB')
         for n in range(1, n_lines+1):
-            self.axisRain.plot(weather.previsions["heureDePrediction"], weather.previsions["precipitations"], 
-                               marker = "o", 
-                               linewidth=2+(diff_linewidth*n), 
-                               alpha=alpha_value,
-                               color = '#08F7FE')
             self.axisTemperature.plot(weather.previsions["heureDePrediction"], weather.previsions["temperaturePrevue"], 
                                marker = "o", 
                                linewidth=2+(diff_linewidth*n), 
                                alpha=alpha_value,                                      
                                color = '#FE53BB')
-                    
+            
+        self.axisTemperature.fill_between(weather.previsions["heureDePrediction"], weather.previsions["temperaturePrevue"], color = "#FE53BB", alpha = 0.2)
+                  
+        self.axisTemperature.set_xlim(min(weather.previsions["heureDePrediction"]), max(weather.previsions["heureDePrediction"]))
         self.axisTemperature.grid(color='#2A3459')
         self.axisRain.grid(color='#2A3459')
 
+        self.axisTemperature.xaxis.set_major_formatter(mdates.DateFormatter('%d'))
         
         self.axisRain.patch.set_alpha(0)
         self.axisTemperature.patch.set_alpha(0)
+        
+        self.axisRain.set_xlim(np.min(weather.previsions["heureDePrediction"].apply(lambda x : x)), np.max(weather.previsions["heureDePrediction"].apply(lambda x : x)))
+        xticks = list(set(weather.previsions["heureDePrediction"].apply(lambda x : x.replace(hour = 0))))
+        self.axisRain.set(xticks = xticks)
+        self.axisRain.set(xticklabels = date.dayOfTheWeek(xticks))
+
+        self.axisTemperature.set_xlim(np.min(weather.previsions["heureDePrediction"].apply(lambda x : x)), np.max(weather.previsions["heureDePrediction"].apply(lambda x : x)))
         
         
         # --
