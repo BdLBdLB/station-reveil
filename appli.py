@@ -1,7 +1,7 @@
 # importing required librarie
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QLabel
 from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtCore import QTimer, QTime, Qt
 
@@ -56,29 +56,37 @@ class Window(QWidget):
         layoutWeather = QHBoxLayout()
         layout.addLayout(layoutWeather)
         
-        layoutInfoWeather = QVBoxLayout()
-        layoutWeather.addLayout(layoutInfoWeather)
+        # create a layout for icon and temperature
+        layoutCloseWeather = QGridLayout()
+        layoutWeather.addLayout(layoutCloseWeather)
         
-        # creating a label for the weather
-        # self.labelWeather = QLabel()
-        # self.labelWeather.setStyleSheet("color : " + fontColor)
-        # self.labelWeather.setAlignment(Qt.AlignCenter)  
-        # self.labelWeather.setFont(QFont(font, 15)) 
-        # layoutInfoWeather.addWidget(self.labelWeather)
-        
-        # creating a label for the weather icon
-        layoutIcon = QHBoxLayout()
-        layoutInfoWeather.addLayout(layoutIcon)
         
         self.labelIconWeather0 = QLabel(self)
-        layoutIcon.addWidget(self.labelIconWeather0)
+        layoutCloseWeather.addWidget(self.labelIconWeather0, 0, 0)
         self.labelIconWeather0.setAlignment(Qt.AlignCenter) 
         self.labelIconWeather1 = QLabel(self)
-        layoutIcon.addWidget(self.labelIconWeather1)
+        layoutCloseWeather.addWidget(self.labelIconWeather1, 0, 1)
         self.labelIconWeather1.setAlignment(Qt.AlignCenter) 
         self.labelIconWeather2 = QLabel(self)
-        layoutIcon.addWidget(self.labelIconWeather2)
+        layoutCloseWeather.addWidget(self.labelIconWeather2, 0, 2)
         self.labelIconWeather2.setAlignment(Qt.AlignCenter) 
+        
+        self.Temperature0 = QLabel()
+        self.Temperature0.setStyleSheet("color : " + fontColor)
+        self.Temperature0.setAlignment(Qt.AlignHCenter)
+        self.Temperature0.setFont(QFont(font, 30))
+        layoutCloseWeather.addWidget(self.Temperature0, 1, 0) 
+        self.Temperature1 = QLabel()
+        self.Temperature1.setStyleSheet("color : " + fontColor)
+        self.Temperature1.setAlignment(Qt.AlignHCenter)
+        self.Temperature1.setFont(QFont(font, 30))
+        layoutCloseWeather.addWidget(self.Temperature1, 1, 1) 
+        self.Temperature2 = QLabel()
+        self.Temperature2.setStyleSheet("color : " + fontColor)
+        self.Temperature2.setAlignment(Qt.AlignHCenter)
+        self.Temperature2.setFont(QFont(font, 30))
+        layoutCloseWeather.addWidget(self.Temperature2, 1, 2) 
+        
          
                 
         # --- plot 
@@ -123,16 +131,19 @@ class Window(QWidget):
         self.labelDay.setText(date.todayAsAString()) # \todo effectuer cette action uniquement si changement de jour
     
     def showWeather(self):
-        # self.labelWeather.setText(getWeather.getWeather())
-        
+               
         weather.updatePrevisions()
         
         pixmap = QPixmap(weather.loadWeatherIcon(0))
         self.labelIconWeather0.setPixmap(pixmap)
-        pixmap = QPixmap(weather.loadWeatherIcon(1))
+        pixmap = QPixmap(weather.loadWeatherIcon(1)) # \todo si forecast 1 trop proche de 0, afficher icone 2 et 3
         self.labelIconWeather1.setPixmap(pixmap)
         pixmap = QPixmap(weather.loadWeatherIcon(2))
         self.labelIconWeather2.setPixmap(pixmap)
+        
+        self.Temperature0.setText(str(round(weather.previsions["temperaturePrevue"][0], 1)) + "°C")
+        self.Temperature1.setText(str(round(weather.previsions["temperaturePrevue"][1], 1)) + "°C")
+        self.Temperature2.setText(str(round(weather.previsions["temperaturePrevue"][2], 1)) + "°C")
         
         
         self.axisTemperature.clear()
@@ -191,5 +202,6 @@ App = QApplication(sys.argv)
 window = Window()  
 # showing all the widgets
 window.show()  
+# window.showFullScreen()
 # start the app
 App.exit(App.exec_())

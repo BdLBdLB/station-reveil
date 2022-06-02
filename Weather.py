@@ -264,6 +264,7 @@ if __name__ == '__main__':
     import matplotlib
     matplotlib.use('TKAgg')
     import matplotlib.dates as mdates
+    import matplotlib.ticker as ticker
     
     import date
     
@@ -293,6 +294,7 @@ if __name__ == '__main__':
     xtickslabel = date.dayOfTheWeek(xticks)
     ax2.set(xticks = xticks)
     ax2.set(xticklabels = xtickslabel)
+    
     
     ax1.set_xlim(np.min(we.previsions["heureDePrediction"].apply(lambda x : x)), np.max(we.previsions["heureDePrediction"].apply(lambda x : x)))
     # ax1.set(xticks = xticks)
