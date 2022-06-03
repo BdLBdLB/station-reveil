@@ -20,9 +20,9 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.dates as mdates
 
 
-# import getWeather
 import Weather
 import date
+import alarm
 
   
   
@@ -44,6 +44,13 @@ class Window(QWidget):
         self.labelClock.setAlignment(Qt.AlignCenter)  
         self.labelClock.setFont(QFont(font, 120, QFont.Bold))
         layout.addWidget(self.labelClock)     
+        
+        # creating a label to display alarm time
+        self.labelAlarm = QLabel() 
+        self.labelAlarm.setStyleSheet("color : " + fontColor)
+        self.labelAlarm.setAlignment(Qt.AlignCenter)  
+        self.labelAlarm.setFont(QFont(font, 15, QFont.Bold))
+        layout.addWidget(self.labelAlarm) 
         
         # creating a label for the day
         self.labelDay = QLabel()
@@ -128,6 +135,15 @@ class Window(QWidget):
         label_time = current_time.toString('hh:mm:ss') 
         self.labelClock.setText(label_time)
         
+        alarmTime = alarm.getAlarmTime()
+        self.labelAlarm.setText("(" + str(alarmTime["hour"]) + ":" + str(alarmTime["minute"]) + ")")
+        
+        if alarm.isItTime(alarmTime) and alarm.isAlarmOn():
+            print("ding dong")
+            window2 = Window()  
+            # showing all the widgets
+            window2.show()  
+        
         self.labelDay.setText(date.todayAsAString()) # \todo effectuer cette action uniquement si changement de jour
     
     def showWeather(self):
@@ -203,5 +219,6 @@ window = Window()
 # showing all the widgets
 window.show()  
 # window.showFullScreen()
-# start the app
+# start the App
+# sys.exit()
 App.exit(App.exec_())

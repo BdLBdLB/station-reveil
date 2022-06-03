@@ -22,7 +22,7 @@ def dayOfTheWeek(date):
     
     day = [] 
     for d in range(0, len(date)):
-        day.append(25*" " + joursDeLaSemaine[date[d].weekday()])
+        day.append(25*" " + joursDeLaSemaine[date[d].weekday()]) # \todo ouh c'est moche !
 
     return day
 
