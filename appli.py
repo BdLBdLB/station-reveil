@@ -32,7 +32,6 @@ class Window(QWidget):
         
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
-
         self.initDateTime()
 
         self.layoutWeather = QHBoxLayout()
@@ -40,30 +39,9 @@ class Window(QWidget):
         
         # create a layout for icon and temperature
         self.layoutCloseWeather = QGridLayout()
-        self.layoutWeather.addLayout(self.layoutCloseWeather)
-        
+        self.layoutWeather.addLayout(self.layoutCloseWeather)     
         self.initWeatherIcons()
-        
-         
-                
-        # --- plot 
-        plt.style.use("seaborn-dark")            
-            
-        self.figure = Figure()
-        matplotlib.rcParams['font.family'] = self.font
-        matplotlib.rcParams['text.color'] = self.fontColor
-        matplotlib.rcParams['axes.labelcolor'] = self.fontColor
-        matplotlib.rcParams['xtick.color'] = self.fontColor
-        matplotlib.rcParams['ytick.color'] = self.fontColor
-        plt.rc('font', size=15)
-        self.figure.patch.set_alpha(0)
-        
-        self.axisTemperature = self.figure.add_subplot(211)  
-        self.axisRain = self.figure.add_subplot(212, sharex = self.axisTemperature)
-        self.canvas = FigureCanvas(self.figure)
-        self.layoutWeather.addWidget(self.canvas)
-        # ---
-        
+        self.initPlot()
         
         timerClock = QTimer(self)  
         timerClock.timeout.connect(self.showTime) # actualisation de la date/heure toutes les secondes
@@ -71,8 +49,7 @@ class Window(QWidget):
         
         timerWeather = QTimer(self)  
         timerWeather.timeout.connect(self.showWeather) 
-        timerWeather.start(1000*60*5) # actualisation de la meteo toutes les 5 minutes     
-        
+        timerWeather.start(1000*60*5) # actualisation de la meteo toutes les 5 minutes            
         self.showWeather()
         
         
@@ -127,7 +104,27 @@ class Window(QWidget):
         self.layoutCloseWeather.addWidget(self.Temperature2, 1, 2) 
 
 
+    def initPlot(self):
+        plt.style.use("seaborn-dark")
+        self.figure = Figure()
+        matplotlib.rcParams['font.family'] = self.font
+        matplotlib.rcParams['text.color'] = self.fontColor
+        matplotlib.rcParams['axes.labelcolor'] = self.fontColor
+        matplotlib.rcParams['xtick.color'] = self.fontColor
+        matplotlib.rcParams['ytick.color'] = self.fontColor
+        plt.rc('font', size=15)
+        self.figure.patch.set_alpha(0)
+        
+        self.axisTemperature = self.figure.add_subplot(211)  
+        self.axisRain = self.figure.add_subplot(212, sharex = self.axisTemperature)
+        self.canvas = FigureCanvas(self.figure)
+        self.layoutWeather.addWidget(self.canvas)
+        
+
     def showTime(self):  
+        """
+        Update every 1s for clock, date and alarm
+        """
         current_time = QTime.currentTime()  
         label_time = current_time.toString('hh:mm:ss') 
         self.labelClock.setText(label_time)
@@ -142,7 +139,9 @@ class Window(QWidget):
     
     
     def showWeather(self):
-               
+        """ 
+        Update every 10 minutes for weather info
+        """               
         weather.updatePrevisions()
         
         pixmap = QPixmap(weather.loadWeatherIcon(0))
@@ -192,8 +191,7 @@ class Window(QWidget):
         self.axisRain.set(xticklabels = date.dayOfTheWeek(xticks))
 
         self.axisTemperature.set_xlim(np.min(weather.previsions["heureDePrediction"].apply(lambda x : x)), np.max(weather.previsions["heureDePrediction"].apply(lambda x : x)))
-        
-        
+              
         # --
         self.axisTemperature.grid(color='#2A3459')
         self.axisRain.grid(color='#2A3459')
