@@ -5,12 +5,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QLabel
 from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtCore import QTimer, QTime, Qt
 
-# from pyqtgraph import PlotWidget, plot # pip install pyqtgraph==0.11.1
-# import pyqtgraph as pg
-
-# import pandas as pd
 import numpy as np
-# from datetime import datetime
 
 import matplotlib
 matplotlib.use("Qt5Agg")
@@ -31,68 +26,23 @@ class Window(QWidget):
     def __init__(self):
         super().__init__()
         self.setGeometry(100, 100, 800, 800)
-        font = "Arial"
-        fontColor = "white"
+        self.font = "Arial"
+        self.fontColor = "white"
         self.setStyleSheet("background-color: black")
         
-        layout = QVBoxLayout()
-        self.setLayout(layout)
+        self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
 
-        # creating a label object for the clock
-        self.labelClock = QLabel() 
-        self.labelClock.setStyleSheet("color : " + fontColor)
-        self.labelClock.setAlignment(Qt.AlignCenter)  
-        self.labelClock.setFont(QFont(font, 120, QFont.Bold))
-        layout.addWidget(self.labelClock)     
-        
-        # creating a label to display alarm time
-        self.labelAlarm = QLabel() 
-        self.labelAlarm.setStyleSheet("color : " + fontColor)
-        self.labelAlarm.setAlignment(Qt.AlignCenter)  
-        self.labelAlarm.setFont(QFont(font, 15, QFont.Bold))
-        layout.addWidget(self.labelAlarm) 
-        
-        # creating a label for the day
-        self.labelDay = QLabel()
-        self.labelDay.setStyleSheet("color : " + fontColor)
-        self.labelDay.setAlignment(Qt.AlignCenter)
-        self.labelDay.setFont(QFont(font, 20))
-        layout.addWidget(self.labelDay) 
+        self.initDateTime()
 
-
-        layoutWeather = QHBoxLayout()
-        layout.addLayout(layoutWeather)
+        self.layoutWeather = QHBoxLayout()
+        self.layout.addLayout(self.layoutWeather)
         
         # create a layout for icon and temperature
-        layoutCloseWeather = QGridLayout()
-        layoutWeather.addLayout(layoutCloseWeather)
+        self.layoutCloseWeather = QGridLayout()
+        self.layoutWeather.addLayout(self.layoutCloseWeather)
         
-        
-        self.labelIconWeather0 = QLabel(self)
-        layoutCloseWeather.addWidget(self.labelIconWeather0, 0, 0)
-        self.labelIconWeather0.setAlignment(Qt.AlignCenter) 
-        self.labelIconWeather1 = QLabel(self)
-        layoutCloseWeather.addWidget(self.labelIconWeather1, 0, 1)
-        self.labelIconWeather1.setAlignment(Qt.AlignCenter) 
-        self.labelIconWeather2 = QLabel(self)
-        layoutCloseWeather.addWidget(self.labelIconWeather2, 0, 2)
-        self.labelIconWeather2.setAlignment(Qt.AlignCenter) 
-        
-        self.Temperature0 = QLabel()
-        self.Temperature0.setStyleSheet("color : " + fontColor)
-        self.Temperature0.setAlignment(Qt.AlignHCenter)
-        self.Temperature0.setFont(QFont(font, 30))
-        layoutCloseWeather.addWidget(self.Temperature0, 1, 0) 
-        self.Temperature1 = QLabel()
-        self.Temperature1.setStyleSheet("color : " + fontColor)
-        self.Temperature1.setAlignment(Qt.AlignHCenter)
-        self.Temperature1.setFont(QFont(font, 30))
-        layoutCloseWeather.addWidget(self.Temperature1, 1, 1) 
-        self.Temperature2 = QLabel()
-        self.Temperature2.setStyleSheet("color : " + fontColor)
-        self.Temperature2.setAlignment(Qt.AlignHCenter)
-        self.Temperature2.setFont(QFont(font, 30))
-        layoutCloseWeather.addWidget(self.Temperature2, 1, 2) 
+        self.initWeatherIcons()
         
          
                 
@@ -100,18 +50,18 @@ class Window(QWidget):
         plt.style.use("seaborn-dark")            
             
         self.figure = Figure()
-        matplotlib.rcParams['font.family'] = font
-        matplotlib.rcParams['text.color'] = fontColor
-        matplotlib.rcParams['axes.labelcolor'] = fontColor
-        matplotlib.rcParams['xtick.color'] = fontColor
-        matplotlib.rcParams['ytick.color'] = fontColor
+        matplotlib.rcParams['font.family'] = self.font
+        matplotlib.rcParams['text.color'] = self.fontColor
+        matplotlib.rcParams['axes.labelcolor'] = self.fontColor
+        matplotlib.rcParams['xtick.color'] = self.fontColor
+        matplotlib.rcParams['ytick.color'] = self.fontColor
         plt.rc('font', size=15)
         self.figure.patch.set_alpha(0)
         
         self.axisTemperature = self.figure.add_subplot(211)  
         self.axisRain = self.figure.add_subplot(212, sharex = self.axisTemperature)
         self.canvas = FigureCanvas(self.figure)
-        layoutWeather.addWidget(self.canvas)
+        self.layoutWeather.addWidget(self.canvas)
         # ---
         
         
@@ -126,10 +76,57 @@ class Window(QWidget):
         self.showWeather()
         
         
-
-
+    def initDateTime(self):  
+        # creating a label object for the clock
+        self.labelClock = QLabel() 
+        self.labelClock.setStyleSheet("color : " + self.fontColor)
+        self.labelClock.setAlignment(Qt.AlignCenter)  
+        self.labelClock.setFont(QFont(self.font, 120, QFont.Bold))
+        self.layout.addWidget(self.labelClock)     
+        
+        # creating a label to display alarm time
+        self.labelAlarm = QLabel() 
+        self.labelAlarm.setStyleSheet("color : " + self.fontColor)
+        self.labelAlarm.setAlignment(Qt.AlignCenter)  
+        self.labelAlarm.setFont(QFont(self.font, 15, QFont.Bold))
+        self.layout.addWidget(self.labelAlarm) 
+        
+        # creating a label for the day
+        self.labelDay = QLabel()
+        self.labelDay.setStyleSheet("color : " + self.fontColor)
+        self.labelDay.setAlignment(Qt.AlignCenter)
+        self.labelDay.setFont(QFont(self.font, 20))
+        self.layout.addWidget(self.labelDay) 
 
   
+    def initWeatherIcons(self):        
+        self.labelIconWeather0 = QLabel(self)
+        self.layoutCloseWeather.addWidget(self.labelIconWeather0, 0, 0)
+        self.labelIconWeather0.setAlignment(Qt.AlignCenter) 
+        self.labelIconWeather1 = QLabel(self)
+        self.layoutCloseWeather.addWidget(self.labelIconWeather1, 0, 1)
+        self.labelIconWeather1.setAlignment(Qt.AlignCenter) 
+        self.labelIconWeather2 = QLabel(self)
+        self.layoutCloseWeather.addWidget(self.labelIconWeather2, 0, 2)
+        self.labelIconWeather2.setAlignment(Qt.AlignCenter) 
+        
+        self.Temperature0 = QLabel()
+        self.Temperature0.setStyleSheet("color : " + self.fontColor)
+        self.Temperature0.setAlignment(Qt.AlignHCenter)
+        self.Temperature0.setFont(QFont(self.font, 30))
+        self.layoutCloseWeather.addWidget(self.Temperature0, 1, 0) 
+        self.Temperature1 = QLabel()
+        self.Temperature1.setStyleSheet("color : " + self.fontColor)
+        self.Temperature1.setAlignment(Qt.AlignHCenter)
+        self.Temperature1.setFont(QFont(self.font, 30))
+        self.layoutCloseWeather.addWidget(self.Temperature1, 1, 1) 
+        self.Temperature2 = QLabel()
+        self.Temperature2.setStyleSheet("color : " + self.fontColor)
+        self.Temperature2.setAlignment(Qt.AlignHCenter)
+        self.Temperature2.setFont(QFont(self.font, 30))
+        self.layoutCloseWeather.addWidget(self.Temperature2, 1, 2) 
+
+
     def showTime(self):  
         current_time = QTime.currentTime()  
         label_time = current_time.toString('hh:mm:ss') 
@@ -140,11 +137,9 @@ class Window(QWidget):
         
         if alarm.isItTime(alarmTime) and alarm.isAlarmOn():
             print("ding dong")
-            window2 = Window()  
-            # showing all the widgets
-            window2.show()  
         
         self.labelDay.setText(date.todayAsAString()) # \todo effectuer cette action uniquement si changement de jour
+    
     
     def showWeather(self):
                
