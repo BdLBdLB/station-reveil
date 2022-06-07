@@ -19,7 +19,7 @@ import Weather
 import date
 import alarm
 
-  
+# %%
   
 class Window(QWidget):
   
