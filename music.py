@@ -14,7 +14,7 @@ class MorningMusic:
     """
     def __init__(self, ringtone):
         self.wave_obj = sa.WaveObject.from_wave_file(ringtone)
-        self.play_obj = wave_obj.play()
+        self.play_obj = self.wave_obj.play()
         
     def stopMusic(self):
         self.play_obj.stop()
@@ -24,10 +24,11 @@ class MorningMusic:
         Repeat the tunes if it is finished
         """
         if self.play_obj.is_playing():
-            print("still playing")
+            #print("still playing")
+            pass
         else:
-            print("again !")
-            self.play_obj = wave_obj.play()
+            #print("again !")
+            self.play_obj = self.wave_obj.play()
 
 
 if __name__ == '__main__':

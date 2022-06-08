@@ -18,6 +18,7 @@ import matplotlib.dates as mdates
 import Weather
 import date
 import alarm
+import alarmWindow
 
 # %%
   
@@ -133,7 +134,8 @@ class Window(QWidget):
         self.labelAlarm.setText("(" + str(alarmTime["hour"]) + ":" + str(alarmTime["minute"]) + ")")
         
         if alarm.isItTime(alarmTime) and alarm.isAlarmOn():
-            print("ding dong")
+            self.win = alarmWindow.Window()
+            self.win.show()
         
         self.labelDay.setText(date.todayAsAString()) # \todo effectuer cette action uniquement si changement de jour
     
