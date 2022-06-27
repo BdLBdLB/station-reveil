@@ -13,8 +13,8 @@ def getAlarmTime():
     \todo get alarm time from database
     """
     alarmTime = {
-        "hour": 15,
-        "minute": 30,
+        "hour": 23,
+        "minute": 19,
         "second": 0}
     
     return alarmTime
